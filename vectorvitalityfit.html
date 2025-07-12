@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VectorVitalityFit | Calculus-Based Fitness</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:ital,wght@0,200;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ff0fc;
+            --secondary: #ff00e6;
+            --tertiary: #00ff87;
+            --dark: #0a0a12;
+            --darker: #050508;
+            --light: #f0f8ff;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(15, 240, 252, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 230, 0.05) 0%, transparent 20%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, .logo-text, .section-title, .cta-button {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 18, 0.8);
+            border-bottom: 1px solid rgba(15, 240, 252, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--light);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--primary), var(--tertiary));
+            color: var(--darker);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(15, 240, 252, 0.5);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(15, 240, 252, 0.8);
+        }
+
+        .free-button {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            color: var(--darker);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(255, 0, 230, 0.5);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .free-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(255, 0, 230, 0.8);
+        }
+
+        .coming-soon-button {
+            background: linear-gradient(45deg, #555, #999);
+            color: var(--light);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: not-allowed;
+            transition: var(--transition);
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 0 15px rgba(15, 240, 252, 0.5);
+        }
+
+        .hero h1 span {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            line-height: 1.6;
+            color: rgba(240, 248, 255, 0.8);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .outline-button {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .outline-button:hover {
+            background: var(--primary);
+            color: var(--darker);
+            box-shadow: 0 0 20px rgba(15, 240, 252, 0.5);
+        }
+
+        .hero-visual {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            height: 70%;
+            background: rgba(15, 240, 252, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(15, 240, 252, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Features Section */
+        .section {
+            padding: 8rem 10%;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: rgba(240, 248, 255, 0.7);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            background: rgba(15, 15, 25, 0.6);
+            border: 1px solid rgba(15, 240, 252, 0.1);
+            border-radius: 15px;
+            padding: 2.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(15, 240, 252, 0.3);
+            box-shadow: 0 10px 30px rgba(15, 240, 252, 0.1);
+        }
+
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            z-index: -1;
+            border-radius: 17px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover:before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: rgba(240, 248, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Mathematical Visualization */
+        .math-viz {
+            background: var(--dark);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 3rem;
+            border: 1px solid rgba(15, 240, 252, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .viz-container {
+            display: flex;
+            width: 100%;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-container {
+            flex: 1;
+            background: rgba(5, 5, 8, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            height: 350px;
+        }
+
+        /* Products Section */
+        .products-section {
+            background: linear-gradient(160deg, var(--darker) 50%, rgba(15, 15, 25, 0.8) 100%);
+            border-top: 1px solid rgba(15, 240, 252, 0.1);
+            border-bottom: 1px solid rgba(15, 240, 252, 0.1);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .product-card {
+            background: rgba(15, 15, 25, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(15, 240, 252, 0.1);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(15, 240, 252, 0.2);
+            border-color: var(--primary);
+        }
+
+        .product-image {
+            height: 200px;
+            background: linear-gradient(45deg, #0a0a12, #1a1a2e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image:before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(transparent, var(--primary), transparent 30%);
+            animation: rotate 4s linear infinite;
+        }
+
+        .product-image-content {
+            position: absolute;
+            width: 95%;
+            height: 95%;
+            background: var(--dark);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+            font-size: 4rem;
+        }
+
+        .product-details {
+            padding: 2rem;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-description {
+            color: rgba(240, 248, 255, 0.7);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .free-price {
+            background: linear-gradient(45deg, var(--tertiary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Calculus Highlight Section */
+        .calculus-highlight {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a12 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 5rem 0;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 40px rgba(15, 240, 252, 0.2);
+        }
+
+        .calculus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .calculus-card {
+            background: rgba(10, 10, 18, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(15, 240, 252, 0.2);
+        }
+
+        .calculus-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .calculus-card ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .calculus-card li {
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .calculus-card li:before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--tertiary);
+        }
+
+        .equation {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            font-family: monospace;
+            font-size: 1.2rem;
+            border-left: 3px solid var(--secondary);
+        }
+
+        /* Payment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--dark);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 50px rgba(15, 240, 252, 0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        #checkout-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            color: var(--tertiary);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            background: rgba(5, 5, 8, 0.7);
+            border: 1px solid rgba(15, 240, 252, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(15, 240, 252, 0.3);
+        }
+
+        #card-element {
+            background: rgba(5, 5, 8, 0.7);
+            border: 1px solid rgba(15, 240, 252, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: var(--transition);
+        }
+
+        #card-element:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(15, 240, 252, 0.3);
+        }
+
+        #card-errors {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        #submit-payment {
+            background: linear-gradient(45deg, var(--primary), var(--tertiary));
+            color: var(--darker);
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        #submit-payment:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(15, 240, 252, 0.4);
+        }
+
+        #submit-payment:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-message i {
+            font-size: 5rem;
+            color: var(--tertiary);
+            margin-bottom: 1.5rem;
+        }
+
+        .success-message h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .success-message p {
+            color: rgba(240, 248, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 5rem 10% 2rem;
+            background: var(--darker);
+            border-top: 1px solid rgba(15, 240, 252, 0.1);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(240, 248, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(15, 240, 252, 0.1);
+            color: var(--primary);
+            transition: var(--transition);
+            font-size: 1.5rem;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(15, 240, 252, 0.5);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(240, 248, 255, 0.1);
+            color: rgba(240, 248, 255, 0.5);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .hero-content {
+                margin-top: 5rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-visual {
+                position: relative;
+                width: 90%;
+                height: 300px;
+                margin-top: 3rem;
+                right: auto;
+                top: auto;
+                transform: none;
+            }
+            
+            .viz-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .modal-content {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-cube"></i>
+            </div>
+            <div class="logo-text">VectorVitalityFit</div>
+        </div>
+        <nav class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#science">The Science</a>
+            <a href="#free-resources">Free Resources</a>
+            <a href="#products">Products</a>
+            <a href="#calculus">Calculus</a>
+        </nav>
+        <button class="cta-button" onclick="scrollToProducts()">View Products</button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Transform Your Fitness with <span>Mathematical Precision</span></h1>
+            <p>VectorVitalityFit combines calculus-based training, physics optimization, and statistical analysis to deliver unparalleled fitness results. Experience the future of human performance.</p>
+            <div class="hero-buttons">
+                <button class="free-button" onclick="downloadFreePDF()">Get Free Cheat Sheet</button>
+                <button class="outline-button" onclick="scrollToCalculus()">Learn the Formulas</button>
+            </div>
+        </div>
+        <div class="hero-visual" id="particles"></div>
+    </section>
+
+    <!-- Science Section -->
+    <section class="section" id="science">
+        <div class="section-header">
+            <h2 class="section-title">The Science Behind Perfection</h2>
+            <p class="section-subtitle">Our proprietary algorithms analyze thousands of data points to create optimized training programs tailored to your unique physiology and goals.</p>
+        </div>
+        
+        <div class="math-viz">
+            <h3>Performance Optimization Algorithm</h3>
+            <div class="viz-container">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculus Highlight Section -->
+    <section class="section" id="calculus">
+        <div class="section-header">
+            <h2 class="section-title">Musculus Calculus Framework</h2>
+            <p class="section-subtitle">Applying mathematical principles to maximize your fitness gains</p>
+        </div>
+        
+        <div class="calculus-highlight">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--tertiary);">THE 3 LAWS OF MUSCULUS CALCULUS</h2>
+            
+            <div class="calculus-grid">
+                <div class="calculus-card">
+                    <h3>1. DERIVATIVE = GAIN ACCELERATOR (dM/dt)</h3>
+                    <p>"Your muscles grow when you hack the RATE of change."</p>
+                    <ul>
+                        <li><strong>Stall Point</strong>: When dM/dt ≈ 0 (plateau = growth flatlines)</li>
+                        <li><strong>Hack It</strong>:
+                            <ul>
+                                <li>Increase Stimulus (k): Swap 1 exercise/week</li>
+                                <li>Crush Recovery Debt (c): Sleep 7+ hrs</li>
+                                <li>Track Progress: Log lifts & watch slope</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="calculus-card">
+                    <h3>2. INTEGRAL = TOTAL GAINZ (∫ Volume dt)</h3>
+                    <p>"Muscle is the AREA under your training curve—not just max weight."</p>
+                    <ul>
+                        <li><strong>Bro Math</strong>: 1 Rep Max(1RM) = height of curve</li>
+                        <li><strong>Calculus Math</strong>: Total volume = width * height</li>
+                        <li><strong>Hack It</strong>:
+                            <ul>
+                                <li>5% Volume Rule: Add 5% total reps/weight weekly</li>
+                                <li>Time Under Tension = ∫ Force dt: Slow eccentrics (3 sec down)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="calculus-card">
+                    <h3>3. OPTIMAL BAR PATH = MIN/MAX PROBLEM</h3>
+                    <p>"Extraordinary lifts are just calculus in disguise."</p>
+                    <ul>
+                        <li><strong>Bench Press Hack</strong>:
+                            <ul>
+                                <li>Standard Path: Straight up/down → energy leaks</li>
+                                <li>Calculus Path: Smooth curve (slight backward arc)</li>
+                            </ul>
+                        </li>
+                        <li><strong>How to Test</strong>: Film lifts & compare to elite bar paths</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="equation">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">THE FULL MUSCLE EQUATION</h3>
+                <p>dM/dt = k·(M<sub>max</sub> – M) – c</p>
+                <ul>
+                    <li><strong>M</strong> = Current muscle mass</li>
+                    <li><strong>k</strong> = Training stimulus (0.3 → 0.7 for advanced lifters)</li>
+                    <li><strong>c</strong> = Recovery debt (sleep, stress, diet)</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="free-button" onclick="downloadFreePDF()">Download Free Cheat Sheet</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Free Resources Section -->
+    <section class="section" id="free-resources">
+        <div class="section-header">
+            <h2 class="section-title">Free Resources</h2>
+            <p class="section-subtitle">Access our scientifically-designed fitness resources at no cost</p>
+        </div>
+        
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <div class="product-image-content">
+                        <i class="fas fa-calculator floating"></i>
+                        <div style="font-size: 1.5rem; margin-top: 1rem;">CALCULUS GAIN CHEAT SHEET</div>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h3 class="product-title">Calculus Gain Cheat Sheet</h3>
+                    <p class="product-description">Master the 3 Laws of Musculus Calculus with this comprehensive guide to calculus-based training optimization.</p>
+                    <div class="product-price free-price">FREE</div>
+                    <button class="free-button" onclick="downloadFreePDF()">Download Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="section products-section" id="products">
+        <div class="section-header">
+            <h2 class="section-title">Premium Digital Resources</h2>
+            <p class="section-subtitle">Access our scientifically-designed fitness programs and educational materials.</p>
+        </div>
+        
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <div class="product-image-content">
+                        <i class="fas fa-bed floating"></i>
+                        <div style="font-size: 1.5rem; margin-top: 1rem;">SLEEP CALCULUS</div>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h3 class="product-title">Sleep Calculus Foundations</h3>
+                    <p class="product-description">"Recovery isn't passive - it's differential calculus in motion." Master the science of optimal sleep for maximum gains.</p>
+                    <div class="product-price">$17.00</div>
+                    <a href="https://vitalvector.gumroad.com/l/fonoy" class="cta-button" target="_blank">Buy Now</a>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-image">
+                    <div class="product-image-content">
+                        <i class="fas fa-project-diagram floating"></i>
+                        <div style="font-size: 1.5rem; margin-top: 1rem;">VECTOR KINEMATICS</div>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h3 class="product-title">Vector Kinematics Guide</h3>
+                    <p class="product-description">Optimize your movement patterns with 3D vector analysis and biomechanical efficiency techniques.</p>
+                    <button class="coming-soon-button">Coming Soon</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-image">
+                    <div class="product-image-content">
+                        <i class="fas fa-infinity floating"></i>
+                        <div style="font-size: 1.5rem; margin-top: 1rem;">QUANTUM RECOVERY</div>
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h3 class="product-title">Quantum Recovery Protocols</h3>
+                    <p class="product-description">Maximize cellular regeneration with our advanced recovery algorithms and sleep optimization strategies.</p>
+                    <button class="coming-soon-button">Coming Soon</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePaymentModal()">&times;</span>
+            <div id="payment-form-container">
+                <h2 class="modal-title" id="modal-product-title">Purchase</h2>
+                <div id="modal-product-price" class="product-price" style="text-align: center; margin-bottom: 2rem;"></div>
+                
+                <form id="checkout-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Card Details</label>
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+                    
+                    <button type="submit" id="submit-payment">Pay Now</button>
+                </form>
+            </div>
+            
+            <div id="success-message" class="success-message">
+                <i class="fas fa-check-circle"></i>
+                <h3>Payment Successful!</h3>
+                <p>Thank you for your purchase. Your PDF will be delivered to your email shortly.</p>
+                <button class="cta-button" onclick="closePaymentModal()">Continue to Website</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>VectorVitalityFit</h3>
+                <p>The future of fitness is here. Experience training optimized by calculus, physics, and cutting-edge science.</p>
+                <div class="social-links">
+                    <a href="https://youtube.com/@vectorvitalityfit?si=3Yx4XvdVc6q7am7I" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@vectorvitalityfit?is_from_webapp=1&sender_device=pc" target="_blank"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.instagram.com/vectorvitalityfit/" target="_blank"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#free-resources"><i class="fas fa-chevron-right"></i> Free Cheat Sheet</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Scientific Research</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Calculus Formulas</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Case Studies</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Products</h3>
+                <ul class="footer-links">
+                    <li><a href="#products"><i class="fas fa-chevron-right"></i> Sleep Calculus</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Vector Kinematics</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Recovery Protocols</a></li>
+                    <li><a href="#products"><i class="fas fa-chevron-right"></i> All Products</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><a href="mailto:vectorvitalityfit@gmail.com"><i class="fas fa-envelope"></i> vectorvitalityfit@gmail.com</a></li>
+                    <li><a href="#"><i class="fas fa-comments"></i> Scientific Support</a></li>
+                    <li><a href="#free-resources"><i class="fas fa-download"></i> Free Resources</a></li>
+                    <li><a href="#"><i class="fas fa-calendar"></i> Consultation Booking</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2023 VectorVitalityFit. All rights reserved. The future of fitness is now.
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.NET({
+            el: "#particles",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0xf0f,
+            backgroundColor: 0x0a0a12,
+            points: 12.00,
+            maxDistance: 22.00,
+            spacing: 17.00
+        });
+
+        // Initialize performance chart
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(performanceCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Strength', 'Power', 'Endurance', 'Mobility', 'Recovery', 'Efficiency'],
+                datasets: [{
+                    label: 'Current',
+                    data: [85, 78, 92, 88, 75, 80],
+                    fill: true,
+                    backgroundColor: 'rgba(15, 240, 252, 0.2)',
+                    borderColor: 'rgb(15, 240, 252)',
+                    pointBackgroundColor: 'rgb(15, 240, 252)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(15, 240, 252)'
+                }, {
+                    label: 'Target',
+                    data: [95, 90, 96, 94, 90, 93],
+                    fill: true,
+                    backgroundColor: 'rgba(255, 0, 230, 0.2)',
+                    borderColor: 'rgb(255, 0, 230)',
+                    pointBackgroundColor: 'rgb(255, 0, 230)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 0, 230)'
+                }]
+            },
+            options: {
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(240, 248, 255, 0.1)'
+                        },
+                        grid: {
+                            color: 'rgba(240, 248, 255, 0.1)'
+                        },
+                        pointLabels: {
+                            color: 'rgba(240, 248, 255, 0.8)',
+                            font: {
+                                size: 11
+                            }
+                        },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            color: 'rgba(240, 248, 255, 0.5)',
+                            showLabelBackdrop: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(240, 248, 255, 0.8)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Initialize progress chart
+        const progressCtx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(progressCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Strength Index',
+                    data: [65, 72, 80, 78, 85, 83, 90],
+                    fill: false,
+                    borderColor: 'rgb(15, 240, 252)',
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Recovery Rate',
+                    data: [50, 65, 70, 75, 78, 80, 85],
+                    fill: false,
+                    borderColor: 'rgb(0, 255, 135)',
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Efficiency Coefficient',
+                    data: [45, 60, 68, 75, 80, 83, 88],
+                    fill: false,
+                    borderColor: 'rgb(255, 0, 230)',
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(240, 248, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(240, 248, 255, 0.7)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(240, 248, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: 'rgba(240, 248, 255, 0.7)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(240, 248, 255, 0.8)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.backgroundColor = 'rgba(5, 5, 8, 0.95)';
+                header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.5)';
+            } else {
+                header.style.backgroundColor = 'rgba(10, 10, 18, 0.8)';
+                header.style.boxShadow = 'none';
+            }
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Scroll to products section
+        function scrollToProducts() {
+            document.getElementById('products').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Scroll to calculus section
+        function scrollToCalculus() {
+            document.getElementById('calculus').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Download free PDF
+        function downloadFreePDF() {
+            alert("In a live environment, this would download your Calculus Gain Cheat Sheet PDF immediately.\n\nFor now, please email vectorvitalityfit@gmail.com to request your free copy!");
+        }
+        
+        // Payment Processing with Stripe
+        const stripe = Stripe('pk_test_51NlzTgJgv5J9bNcVJ5d8dK2W3Z6dQ6sK7qFJt8jX3fXjJhK4Yj3V1gQ7fXrJ3H0Q6L1sJ3XmY6y4J8lX0F00'); // Test public key
+        
+        // Initialize Stripe Elements
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    color: '#f0f8ff',
+                    fontFamily: '"Exo 2", sans-serif',
+                    fontSmoothing: 'antialiased',
+                    fontSize: '16px',
+                    '::placeholder': {
+                        color: '#a0aec0'
+                    }
+                },
+                invalid: {
+                    color: '#ff6b6b',
+                    iconColor: '#ff6b6b'
+                }
+            }
+        });
+        cardElement.mount('#card-element');
+        
+        // Handle form submission
+        const form = document.getElementById('checkout-form');
+        const cardErrors = document.getElementById('card-errors');
+        const submitButton = document.getElementById('submit-payment');
+        
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // Disable button to prevent multiple submissions
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+            
+            // Create payment method
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    email: document.getElementById('email').value
+                }
+            });
+            
+            if (error) {
+                // Show error
+                cardErrors.textContent = error.message;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay Now';
+            } else {
+                // In a real application, you would send the paymentMethod.id to your server
+                // Here we simulate a successful payment
+                setTimeout(() => {
+                    // Show success message
+                    document.getElementById('payment-form-container').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                    
+                    // For demo purposes, we simulate a successful payment
+                    console.log('Payment successful! PaymentMethod:', paymentMethod);
+                }, 1500);
+            }
+        });
+        
+        // Payment modal functions
+        let currentProduct = {};
+        
+        function showPaymentModal(productName, price) {
+            currentProduct = { name: productName, price: price };
+            
+            document.getElementById('modal-product-title').textContent = productName;
+            document.getElementById('modal-product-price').textContent = `$${price.toFixed(2)}`;
+            
+            // Reset form
+            form.reset();
+            cardElement.clear();
+            cardErrors.textContent = '';
+            submitButton.disabled = false;
+            submitButton.textContent = 'Pay Now';
+            
+            // Show modal
+            document.getElementById('payment-modal').style.display = 'flex';
+            document.getElementById('payment-form-container').style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+        
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+        }
+        
+        // Close modal if clicked outside
+        window.addEventListener('click', (event) => {
+            if (event.target === document.getElementById('payment-modal')) {
+                closePaymentModal();
+            }
+        });
+    </script>
+</body>
+</html>
